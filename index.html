@@ -95,11 +95,20 @@ const S=[
  {  html:()=>bar()+`<div class="scr">${prog(33)}<h2>Seus dados para receber a proposta no WhatsApp</h2><label class="fld"><small>Nome</small><input id="f_nome" placeholder="Maria Souza"></label><label class="fld"><small>WhatsApp</small><input id="f_zap" inputmode="tel" placeholder="(48) 9 0000-0000"></label><label class="fld"><small>Cidade</small><input id="f_cid" placeholder="Digite sua cidade"></label>${dd('metragem','Metragem aproximada','Escolha a metragem',[['18 a 30 m²'],['30 a 60 m²'],['Mais de 60 m²']])}<div class="btn">Continuar</div><p class="mic">Usamos seus dados apenas para enviar a proposta. <a href="privacidade.html" target="_blank" rel="noopener" style="color:inherit">Política de privacidade</a></p></div>`},
  {  html:()=>bar()+`<div class="scr">${prog(66)}<h2>Sobre a obra</h2><div class="lbl">O piso atual precisa ser removido ou nivelado antes?</div>${opt([['Não'],['Sim','obra maior'],['Não sei']])}<div class="lbl" style="margin-top:6px">Quando pretende fazer?</div>${opt([['Em até 30 dias'],['De 1 a 3 meses'],['Só pesquisando','encerra']])}<div class="btn">Revisar</div></div>`},
  {  html:()=>bar()+`<div class="scr">${prog(100)}<h2>Confira antes de enviar</h2><div class="rev"><div><span>Nome</span>${V.n||'Maria Souza'}</div><div><span>WhatsApp</span>${V.z||'(48) 9 0000-0000'}</div><div><span>Cidade</span>${V.c||'São José'}</div><div><span>Metragem</span>${V.m||'30 a 60 m²'}</div><div><span>Piso atual</span>Não precisa mexer</div><div><span>Prazo</span>Em até 30 dias</div></div><div class="btn">Enviar</div></div>`},
- {  html:()=>bar()+`<div class="scr done"><div class="ck">✓</div><h2>Recebemos seu pedido!</h2><p>O Alysson vai te chamar no WhatsApp em breve.</p><div class="ig">Ver obras no Instagram</div></div>`,
+ {  html:()=>bar()+`<div class="scr done"><div class="ck">✓</div><h2>Recebemos seu pedido!</h2>${qualificado()?'<p>Estamos abrindo o WhatsApp do Alysson para você falar com ele agora.</p><a class="ig" href="'+waLink()+'" style="text-decoration:none;display:block">Abrir WhatsApp</a>':'<p>O Alysson vai te chamar no WhatsApp em breve.</p><div class="ig">Ver obras no Instagram</div>'}</div>`,
   html2:()=>bar()+`<div class="scr done"><div class="ck" style="background:#f3ece7;color:#8a7c73">i</div><h2>Obrigado pelo interesse!</h2><p>Quando quiser trocar seu piso, é só nos chamar.</p><div class="ig">Ver obras no Instagram</div></div>`}
 ];
 const ENDPOINT='https://script.google.com/macros/s/AKfycbzurJHIPH2Cips6z3lnHJuYs5a3MA6zBAySKirPSH6Y2Ub5bUPjWY0t71orGjQFkQ0Viw/exec';
 const V={};
+const WA='5548991458125';
+function qualificado(){let s=0;const p=V.q,x=V.p,m=V.m;
+  if(p==='Em até 30 dias')s+=3;else if(p==='De 1 a 3 meses')s+=1;else if(p==='Só pesquisando')return false;
+  if(x==='Não')s+=2;else if(x==='Sim')s-=1;
+  if(m==='Mais de 60 m²')s+=2;else if(m==='30 a 60 m²')s+=1;
+  return s>=6}
+function waLink(){const t='Olá, Alysson! Aqui é '+V.n+(V.c?', de '+V.c:'')+'. Acabei de pedir a proposta de piso vinílico SPC pelo formulário. Metragem: '+(V.m||'não informada')+'. Quero fazer '+(V.q?V.q.toLowerCase():'em breve')+'.'+(V.p==='Não'?' Meu piso atual não precisa ser removido.':'');
+  return 'https://wa.me/'+WA+'?text='+encodeURIComponent(t)}
+
 function enviar(){if(ENDPOINT.includes('__')||!V.z)return;const q=new URLSearchParams(location.search);
   const lead={nome:V.n,zap:V.z,cidade:V.c,metragem:V.m||'',piso:V.p||'',prazo:V.q||'',origem:'form'+(q.get('utm_campaign')?':'+q.get('utm_campaign'):'')};
   try{fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'form',lead}),keepalive:true}).catch(()=>{})}catch(e){}}
@@ -133,7 +142,8 @@ function draw(){
   $('phone').querySelectorAll('.btn').forEach(bt=>{bt.setAttribute('role','button');bt.tabIndex=0;bt.style.cursor='pointer';
     const go=()=>{if(i>=S.length-1)return;if(!valid())return;
     const ph=$('phone'),ops=[...ph.querySelectorAll('.opt')];if(ops.length){const tx=o=>o?o.querySelector('span').textContent:'';V.p=tx(ops.slice(0,3).find(o=>o.classList.contains('sel')));V.q=tx(ops.slice(3).find(o=>o.classList.contains('sel')))}
-    const wasData=!!$('f_nome');if(stopFlag){i=S.length-1;alt=true}else{i++;alt=false}draw();window.scrollTo?.({top:0});if(wasData||i===S.length-1)enviar()};
+    const wasData=!!$('f_nome');if(stopFlag){i=S.length-1;alt=true}else{i++;alt=false}draw();window.scrollTo?.({top:0});if(wasData||i===S.length-1)enviar();
+    if(i===S.length-1&&!alt&&qualificado())setTimeout(()=>{location.href=waLink()},900)};
     bt.addEventListener('click',go);bt.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}})});
   $('phone').querySelectorAll('[data-dd]').forEach(d=>{const btn=d.querySelector('.fld'),lst=d.querySelector('.lst'),val=d.querySelector('.val'),msg=$('phone').querySelector('[data-stop-for="'+d.dataset.dd+'"]');
     btn.addEventListener('click',()=>{lst.hidden=!lst.hidden});
