@@ -105,7 +105,7 @@ function qualificado(){let s=0;const p=V.q,x=V.p,m=V.m;
   if(p==='Em até 30 dias')s+=3;else if(p==='De 1 a 3 meses')s+=1;else if(p==='Só pesquisando')return false;
   if(x==='Não')s+=2;else if(x==='Sim')s-=1;
   if(m==='Mais de 60 m²')s+=2;else if(m==='30 a 60 m²')s+=1;
-  return s>=6}
+  return s>=6||(p==='Em até 30 dias'&&x==='Não')}
 function waLink(){const t='Olá, Alysson! Aqui é '+V.n+(V.c?', de '+V.c:'')+'. Acabei de pedir a proposta de piso vinílico SPC pelo formulário. Metragem: '+(V.m||'não informada')+'. Quero fazer '+(V.q?V.q.toLowerCase():'em breve')+'.'+(V.p==='Não'?' Meu piso atual não precisa ser removido.':'');
   return 'https://wa.me/'+WA+'?text='+encodeURIComponent(t)}
 

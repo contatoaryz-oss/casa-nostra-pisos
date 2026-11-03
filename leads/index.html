@@ -104,7 +104,7 @@ a.zap{display:inline-flex;gap:6px;align-items:center;justify-content:center;text
       <li>Pontos pelo prazo: até 30 dias +3, de 1 a 3 meses +1. "Só pesquisando" vai direto para pouco interessante.</li>
       <li>Pontos pelo piso atual: não precisa remover +2, não sabe 0, precisa remover ou nivelar −1 (obra maior).</li>
       <li>Pontos pela metragem: mais de 60 m² +2, 30 a 60 m² +1, 18 a 30 m² 0.</li>
-      <li>6 pontos ou mais: potencial. 1 ponto ou menos: pouco interessante. No meio: para qualificar.</li>
+      <li>6 pontos ou mais: potencial. Quem quer fazer em até 30 dias e não precisa remover o piso também é potencial, em qualquer metragem. 1 ponto ou menos: pouco interessante. No meio: para qualificar.</li>
       <li>Você pode mover qualquer lead de categoria no próprio cartão.</li>
     </ul>
   </details>
@@ -136,7 +136,7 @@ function classify(l){
   else if(l.metragem==='30 a 60 m²'){s+=1;r.push(['30 a 60 m²','pos'])}
   else if(l.metragem==='18 a 30 m²'){r.push(['18 a 30 m²','neu'])}
   if(!r.length)r.push(['Sem respostas do formulário','neu']);
-  let cat=s>=6?'potencial':'qualificar';
+  let cat=(s>=6||(l.prazo==='Em até 30 dias'&&l.piso==='Não'))?'potencial':'qualificar';
   if(l.prazo==='Só pesquisando'||s<=1&&r[0][0]!=='Sem respostas do formulário')cat='pouco';
   return{cat,reasons:r};
 }
